@@ -1,80 +1,72 @@
 import { Schema, model } from 'mongoose';
+import { genderList, userRoleList } from '../Config/data.js';
 
-const UserSchema = new Schema(
-  {
-    credType: {
-      type: String,
-      enum: ['local', 'google'],
-      required: true,
-      default: 'local',
-    },
 
-    googleId: {
-      type: String,
-      trim: true,
-    },
+const UserSchema = new Schema({
+    googleId: { type: String },
 
     firstName: {
-      type: String,
-      required: true,
-      trim: true,
+        type: String,
+        required: true,
+        trim: true,
     },
-
     lastName: {
-      type: String,
-      trim: true,
+        type: String,
+        trim: true,
     },
-
     gender: {
-      type: String,
-      enum: ['male', 'female', 'other'],
+        type: String,
+        enum: genderList
     },
-
     email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
+        type: String,
+        sparse: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
     },
-
     mobile: {
-      type: String,
-      trim: true,
+        type: String,
+        unique: true,
+        sparse: true,
     },
-
     password: {
-      type: String,
-      required: function () {
-        return this.credType === 'local'; // required only if local login
-      },
+        type: String,
     },
+
     wishlist: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Product',
-      },
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Product',
+        },
     ],
+
     cart: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Cart',
-      },
+        {
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: 'Product',
+            },
+            quantity: {
+                type: Number,
+                default: 1,
+                min: 1,
+            },
+
+            specs: [
+                {
+                    variationId: { type: Schema.Types.ObjectId, ref: 'Variation' }, // e.g., 'Color', 'Size'
+                    optionId: { type: Schema.Types.ObjectId, ref: 'Option' },
+                }
+            ]
+        },
     ],
 
-    role: {
-      type: String,
-      enum: ['user', 'admin'],
-      default: 'user',
-      required: true,
-    },
+    role: { type: String, default: 'user', enum: userRoleList },
 
-    isBlocked: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  { timestamps: true }
-);
+    isBlocked: { type: Boolean, default: false },
 
-export const User = model('User', UserSchema);
+}, { timestamps: true })
+
+
+export const User = model('User', UserSchema)

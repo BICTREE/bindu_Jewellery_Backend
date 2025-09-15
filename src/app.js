@@ -3,6 +3,11 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { authRouter } from "./routes/auth.route.js";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
+import { userRouter } from "./routes/user.route.js";
+import logger from "./utils/logger.util.js";
+import { enquiryRouter } from "./routes/enquiry.route.js";
+import { productRouter } from "./routes/product.route.js";
+import { bannerRouter } from "./routes/banner.route.js";
 
 const app = express();
 
@@ -60,6 +65,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/banners", bannerRouter);
+app.use("/api/users", userRouter);
+app.use("/api/enquiries", enquiryRouter);
+app.use("/api/products", productRouter);
 
 app.use((req, res) =>
   res.status(404).json({
