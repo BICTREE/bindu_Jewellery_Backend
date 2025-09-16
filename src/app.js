@@ -8,6 +8,7 @@ import logger from "./utils/logger.util.js";
 import { enquiryRouter } from "./routes/enquiry.route.js";
 import { productRouter } from "./routes/product.route.js";
 import { bannerRouter } from "./routes/banner.route.js";
+import { categoryRouter } from "./routes/category.route.js";
 
 const app = express();
 
@@ -68,6 +69,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/banners", bannerRouter);
 app.use("/api/users", userRouter);
 app.use("/api/enquiries", enquiryRouter);
+app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
 
 app.use((req, res) =>
