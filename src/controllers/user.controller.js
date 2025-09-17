@@ -4,7 +4,7 @@ import timezone from 'dayjs/plugin/timezone.js';
 import { OTPVerificationStatus, validateOTPWithEmail, validateOTPWithMobile, verifyOTP } from '../services/auth.service.js';
 import { validateEmail, validateMobile } from '../utils/validate.util.js';
 import { hashPassword } from '../utils/password.util.js';
-import { countUsers, createAddress, createUser, deleteAddress, fetchManyAddress, fetchOneAddress, fetchSingleAddress, getManyUsers, getUserByEmail, getUserById, getUserByMobile, updateAddress, updateUser, updateUserStatus } from '../services/user.service.js';
+import { addToWishlist, countUsers, createAddress, createUser, deleteAddress, fetchManyAddress, fetchOneAddress, fetchSingleAddress, getManyUsers, getUserByEmail, getUserById, getUserByMobile, getWishlist, removeFromWishlist, updateAddress, updateUser, updateUserStatus } from '../services/user.service.js';
 import { genderList } from '../Config/data.js';
 import { isValidObjectId } from 'mongoose';
 import { findManyOrders } from '../services/order.service.js';
@@ -660,6 +660,103 @@ export const getManyUsersCtrl = async (req, res) => {
         })
     }
 }
+
+export const addToWishlistCtrl = async (req, res) => {
+    try {
+        console.log("sadasasd data incoming ")
+        const { userId } = req.user;
+        const { productId } = req.body;
+        console.log(userId, productId , "data")
+
+        if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Id',
+                data: null,
+                error: 'BAD_REQUEST'
+            })
+        }
+
+        const wishlist = await addToWishlist(userId, productId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'success',
+            data: { wishlist },
+            error: null
+        })
+
+    } catch (error) {
+        const errorObj = JSON.parse(error?.message)
+        const { statusCode, ...rest } = errorObj
+
+        return res.status(statusCode || 500).json(rest || {
+            success: false,
+            message: msg ?? "Internal Server error",
+            data: null,
+            error: 'INTERNAL_SERVER_ERROR'
+        })
+    }
+}
+
+export const getWishlistCtrl = async (req, res) => {
+    try {
+        const { userId } = req.user;
+
+        const wishlist = await getWishlist(userId)
+        res.status(200).json({
+            success: true,
+            message: 'success',
+            data: { wishlist },
+            error: null
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal Server error",
+            data: null,
+            error: 'INTERNAL_SERVER_ERROR'
+        })
+    }
+};
+
+export const removeFromWishlistCtrl = async (req, res) => {
+    try {
+        const { userId } = req.user;
+
+        const { productId } = req.body;
+
+        if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Id',
+                data: null,
+                error: 'BAD_REQUEST'
+            })
+        }
+
+        const wishlist = await removeFromWishlist(userId, productId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'success',
+            data: { wishlist },
+            error: null
+        })
+
+    } catch (error) {
+        const errorObj = JSON.parse(error?.message)
+        const { statusCode, ...rest } = errorObj
+
+        return res.status(statusCode || 500).json(rest || {
+            success: false,
+            message: msg ?? "Internal Server error",
+            data: null,
+            error: 'INTERNAL_SERVER_ERROR'
+        })
+    }
+}
+
 
 
 export const getUserAddresssesCtrl = async (req, res) => {
