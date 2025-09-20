@@ -11,6 +11,6 @@ connectDB()
 
 const PORT = process.env.PORT || 8080
 // ✅ instead export handler for Vercel
-export const handler = ServerlessHttp(app);
+// export const handler = ServerlessHttp(app);
 
-// app.listen(PORT, ()=> console.log(`Server started at http://localhost:${PORT}`))
+app.listen(PORT, ()=> console.log(`Server started at http://localhost:${PORT}`))
