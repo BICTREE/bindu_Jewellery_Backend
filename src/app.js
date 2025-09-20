@@ -20,51 +20,100 @@ const {
   NODE_ENV,
 } = process.env;
 
+// Debug environment variables
+console.log("=== Environment Debug ===");
+console.log("NODE_ENV:", `"${NODE_ENV}"`);
+console.log("user_dev_url:", user_dev_url);
+console.log("admin_dev_url:", admin_dev_url);
+console.log("user_prod_url:", user_prod_url);
+console.log("admin_prod_url:", admin_prod_url);
+console.log("All process.env keys:", Object.keys(process.env).filter(key => key.includes('NODE_ENV') || key.includes('url')));
+console.log("========================");
+
 app.use(cookieParser());
 
+// Fixed CORS configuration
 const corsOptions = {
   credentials: true,
   origin: function (origin, callback) {
-    if (!origin || NODE_ENV === "development") {
+    console.log("Incoming Origin:", origin);
+    
+    // Allow requests with no origin (like mobile apps, Postman, etc.)
+    if (!origin) {
+      console.log("✅ Allowing request with no origin");
+      return callback(null, true);
+    }
+    
+    // Check if we're in development mode - multiple ways to check
+    const isDevelopment = 
+      NODE_ENV?.toLowerCase().trim() === "development" || 
+      process.env.NODE_ENV?.toLowerCase().trim() === "development" ||
+      !NODE_ENV || // If NODE_ENV is not set, assume development
+      NODE_ENV === undefined;
+    
+    console.log("Is Development Mode:", isDevelopment);
+    
+    // TEMPORARY FIX: Allow localhost origins in development
+    const isLocalhost = origin && (
+      origin.includes('localhost') || 
+      origin.includes('127.0.0.1') ||
+      origin.includes('::1')
+    );
+    
+    if (isDevelopment || isLocalhost) {
+      console.log("✅ Development mode or localhost - allowing origin:", origin);
+      return callback(null, true);
+    }
+    
+    // In production, check against allowed origins
+    const allowedOrigins = [
+      user_dev_url,
+      admin_dev_url,
+      user_prod_url,
+      admin_prod_url,
+      // Fallback localhost URLs in case env vars aren't working
+      "http://localhost:5173",
+      "http://localhost:5174",
+    ].filter(Boolean); // Remove any undefined/null values
+    
+    console.log("Allowed origins:", allowedOrigins);
+    
+    if (allowedOrigins.includes(origin)) {
+      console.log("✅ Origin allowed:", origin);
       callback(null, true);
     } else {
-      const allowedOrigins = [
-        user_dev_url,
-        admin_dev_url,
-        user_prod_url,
-        admin_prod_url,
-      ];
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Origin not allowed by CORS"));
-      }
+      console.log("❌ Origin not allowed:", origin);
+      callback(new Error("Origin not allowed by CORS"));
     }
   },
 };
 
-// ✅ this was misplaced inside the object earlier
 app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Request logging middleware
 app.use((req, res, next) => {
   logger.info(`${req.method} ${req.originalUrl}`);
   next();
 });
 
+// Root route
 app.get("/", (req, res) => {
   return res.send(`
     <html>
       <head><title>Bindu Jewellery</title></head>
       <body>
         <h1>Bindu Jewellery API</h1>
+        <p>Environment: ${NODE_ENV}</p>
+        <p>Server is running properly!</p>
       </body>
     </html>
   `);
 });
 
+// API routes
 app.use("/api/auth", authRouter);
 app.use("/api/banners", bannerRouter);
 app.use("/api/users", userRouter);
@@ -72,6 +121,7 @@ app.use("/api/enquiries", enquiryRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
 
+// 404 handler
 app.use((req, res) =>
   res.status(404).json({
     success: false,
@@ -81,9 +131,10 @@ app.use((req, res) =>
   })
 );
 
-// 🔹 ensure errorHandler is imported before using
+// Error handler (should be last)
 app.use(errorHandler);
 
+// Process error handlers
 process.on("unhandledRejection", (reason) => {
   logger.error(`Unhandled Rejection: ${reason}`);
 });
