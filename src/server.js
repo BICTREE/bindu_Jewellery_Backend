@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { connectDB } from './Config/connectDB.js';
+import { connectDB } from './config/connectDB.js';
 import app from './app.js';
 import ServerlessHttp from 'serverless-http';
 
