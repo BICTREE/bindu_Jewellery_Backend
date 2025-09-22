@@ -1,4 +1,4 @@
-import { userRoleList } from "../Config/data.js";
+import { userRoleList } from "../config/data.js";
 import { verifyAccessToken } from "../utils/jwt.util.js";
 
 export const authMiddleware = (req, res, next) => {

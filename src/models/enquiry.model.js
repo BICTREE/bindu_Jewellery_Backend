@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { enquiryTypeList } from "../Config/data.js";
+import { enquiryTypeList } from "../config/data.js";
 
 const enquirySchema = new Schema({
     type: { type: String, enum: enquiryTypeList, default: 'Contact' },

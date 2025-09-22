@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { genderList, userRoleList } from '../Config/data.js';
+import { genderList, userRoleList } from '../config/data.js';
 
 
 const UserSchema = new Schema({

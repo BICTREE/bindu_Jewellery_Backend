@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import { payModeList, payStatusList, orderStatusList, deliveryTypeList,
-     buyModeList, refundStatusList } from "../Config/data.js";
+     buyModeList, refundStatusList } from "../config/data.js";
 
 const OrderSchema = new Schema(
   {
