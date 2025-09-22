@@ -1,5 +1,5 @@
 import { body } from 'express-validator';
-import { enquiryTypeList } from '../Config/data.js'
+import { enquiryTypeList } from '../config/data.js'
 
 const validatePostEnquiry = [
     body('type')

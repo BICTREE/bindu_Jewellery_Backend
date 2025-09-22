@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { credTypeList, genderList, userRoleList } from "../Config/data.js";
+import { credTypeList, genderList, userRoleList } from "../config/data.js";
 
 const userValidator = {
     create: [

@@ -5,7 +5,7 @@ import { OTPVerificationStatus, validateOTPWithEmail, validateOTPWithMobile, ver
 import { validateEmail, validateMobile } from '../utils/validate.util.js';
 import { hashPassword } from '../utils/password.util.js';
 import { addToWishlist, countUsers, createAddress, createUser, deleteAddress, fetchManyAddress, fetchOneAddress, fetchSingleAddress, getManyUsers, getUserByEmail, getUserById, getUserByMobile, getWishlist, removeFromWishlist, updateAddress, updateUser, updateUserStatus } from '../services/user.service.js';
-import { genderList } from '../Config/data.js';
+import { genderList } from '../config/data.js';
 import { isValidObjectId } from 'mongoose';
 import { findManyOrders } from '../services/order.service.js';
 
