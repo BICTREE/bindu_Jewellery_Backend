@@ -73,8 +73,9 @@ const corsOptions = {
       admin_prod_url,
       // Fallback localhost URLs in case env vars aren't working
       "http://localhost:5173",
-      "https://bindu-jewellery-admin-side.vercel.app",
       "http://localhost:5174",
+      "https://bindu-jewellery-admin-side.vercel.app",
+      "https://bindu-jewellery-frontend.vercel.app",
     ].filter(Boolean); // Remove any undefined/null values
     
     console.log("Allowed origins:", allowedOrigins);
