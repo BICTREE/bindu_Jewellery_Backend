@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addToWishlistCtrl, createUserCtrl, deleteAddresssesCtrl, getAllAddresssesCtrl, getManyUsersCtrl, getOneAddressCtrl, getUserAddresssesCtrl, getUserByIdCtrl, getUserProfileByIdCtrl, getWishlistCtrl, postAddresssesCtrl, registerUserCtrl, removeFromWishlistCtrl, updateAddresssesCtrl, updateUserCtrl, updateUserStatusCtrl } from "../controllers/user.controller.js";
+import { addToCartCtrl, addToWishlistCtrl, createUserCtrl, deleteAddresssesCtrl, getAllAddresssesCtrl, getCartCtrl, getManyUsersCtrl, getOneAddressCtrl, getUserAddresssesCtrl, getUserByIdCtrl, getUserProfileByIdCtrl, getWishlistCtrl, postAddresssesCtrl, registerUserCtrl, removeFromCartCtrl, removeFromWishlistCtrl, setCartCtrl, updateAddresssesCtrl, updateCartCtrl, updateUserCtrl, updateUserStatusCtrl } from "../controllers/user.controller.js";
 import { validateMW } from "../middleware/validate.middleware.js";
 import { roleChecker } from "../middleware/roleChecker.middleware.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
@@ -15,6 +15,13 @@ userRouter.use(authMiddleware)
 userRouter.post("/wishlists/add", addToWishlistCtrl);
 userRouter.post("/wishlists/remove", removeFromWishlistCtrl);
 
+
+userRouter.post("/carts/set", setCartCtrl);
+userRouter.post("/carts/add", addToCartCtrl);
+userRouter.put("/carts/update", updateCartCtrl);
+userRouter.post("/carts/remove", removeFromCartCtrl);
+
+userRouter.get("/carts", getCartCtrl);
 userRouter.get("/wishlists", getWishlistCtrl);
 
 userRouter.post('/addresses', addressValidator.create, validateMW, postAddresssesCtrl)

@@ -4,10 +4,11 @@ import timezone from 'dayjs/plugin/timezone.js';
 import { OTPVerificationStatus, validateOTPWithEmail, validateOTPWithMobile, verifyOTP } from '../services/auth.service.js';
 import { validateEmail, validateMobile } from '../utils/validate.util.js';
 import { hashPassword } from '../utils/password.util.js';
-import { addToWishlist, countUsers, createAddress, createUser, deleteAddress, fetchManyAddress, fetchOneAddress, fetchSingleAddress, getManyUsers, getUserByEmail, getUserById, getUserByMobile, getWishlist, removeFromWishlist, updateAddress, updateUser, updateUserStatus } from '../services/user.service.js';
+import { addToCart, addToWishlist, countUsers, createAddress, createUser, deleteAddress, fetchManyAddress, fetchOneAddress, fetchSingleAddress, getCart, getManyUsers, getUserByEmail, getUserById, getUserByMobile, getWishlist, removeFromCart, removeFromWishlist, setCart, updateAddress, updateCart, updateUser, updateUserStatus } from '../services/user.service.js';
 import { genderList } from '../config/data.js';
 import { isValidObjectId } from 'mongoose';
 import { findManyOrders } from '../services/order.service.js';
+import { checkIfVariantExists, getProductById } from '../services/product.service.js';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -741,6 +742,257 @@ export const removeFromWishlistCtrl = async (req, res) => {
             success: true,
             message: 'success',
             data: { wishlist },
+            error: null
+        })
+
+    } catch (error) {
+        const errorObj = JSON.parse(error?.message)
+        const { statusCode, ...rest } = errorObj
+
+        return res.status(statusCode || 500).json(rest || {
+            success: false,
+            message: msg ?? "Internal Server error",
+            data: null,
+            error: 'INTERNAL_SERVER_ERROR'
+        })
+    }
+}
+
+
+
+export const setCartCtrl = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const { cart = [] } = req.body;
+
+        if (!isValidObjectId(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Id',
+                data: null,
+                error: 'BAD_REQUEST'
+            });
+        }
+
+        if (!Array.isArray(cart)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cart must be an array',
+                data: null,
+                error: 'BAD_REQUEST'
+            });
+        }
+
+        const user = await getUserById(userId);
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'User not found',
+                data: null,
+                error: 'BAD_REQUEST'
+            });
+        }
+
+        for (const { productId, specs = [] } of cart) {
+            if (!productId || !isValidObjectId(productId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid product ID in cart item',
+                    data: null,
+                    error: 'BAD_REQUEST'
+                });
+            }
+
+            const product = await getProductById(productId)
+
+            if (!product) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Product not found: ${productId}`,
+                    data: null,
+                    error: 'BAD_REQUEST'
+                });
+            }
+
+            if (!Array.isArray(specs)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'specs must be an array',
+                    data: null,
+                    error: 'BAD_REQUEST'
+                });
+            }
+
+            if (specs?.length > 0) {
+                const existingSpec = await checkIfVariantExists(productId, specs);
+                if (!existingSpec) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `Spec doesn't exist in product: ${productId}`,
+                        data: null,
+                        error: 'BAD_REQUEST'
+                    });
+                }
+            }
+        }
+
+        await setCart(userId, cart);
+        const updatedCart = await getCart(userId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'success',
+            data: { cart: updatedCart },
+            error: null
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: error?.message || "Internal Server error",
+            data: null,
+            error: 'INTERNAL_SERVER_ERROR'
+        });
+    }
+};
+
+
+export const addToCartCtrl = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        
+        const { productId, quantity, specs = [] } = req.body;
+        
+        if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Id',
+                data: null,
+                error: 'BAD_REQUEST'
+            })
+        }
+        
+        const existingVariation = await checkIfVariantExists(productId, specs)
+        
+        if (!existingVariation) {
+            return res.status(400).json({
+                success: false,
+                message: 'Variation doesn\'t exist in product',
+                data: null,
+                error: 'BAD_REQUEST'
+            })
+        }
+        
+        console.log("api called ")
+        console.log({ userId, productId, quantity, specs })
+
+        await addToCart(userId, productId, quantity, specs);
+
+        const cart = await getCart(userId)
+
+        return res.status(200).json({
+            success: true,
+            message: 'success',
+            data: { cart },
+            error: null
+        })
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            success: false,
+            message: error?.message || "Internal Server error",
+            data: null,
+            error: 'INTERNAL_SERVER_ERROR'
+        })
+    }
+}
+
+export const getCartCtrl = async (req, res) => {
+    console.log("api is Called")
+    try {
+        const { userId } = req.user;
+
+        const cart = await getCart(userId)
+        res.status(200).json({
+            success: true,
+            message: 'success',
+            data: { cart },
+            error: null
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal Server error",
+            data: null,
+            error: 'INTERNAL_SERVER_ERROR'
+        })
+    }
+};
+
+export const updateCartCtrl = async (req, res) => {
+    try {
+        const { userId } = req.user;
+
+        const { itemId, quantity } = req.body;
+
+        if (!isValidObjectId(userId) || !isValidObjectId(itemId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Id',
+                data: null,
+                error: 'BAD_REQUEST'
+            })
+        }
+
+        await updateCart(userId, itemId, quantity);
+
+        const cart = await getCart(userId)
+
+        return res.status(200).json({
+            success: true,
+            message: 'success',
+            data: { cart },
+            error: null
+        })
+
+    } catch (error) {
+        console.log(error)
+        const msg = error?.message;
+
+        return res.status(500).json({
+            success: false,
+            message: msg ?? "Internal Server error",
+            data: null,
+            error: 'INTERNAL_SERVER_ERROR'
+        })
+    }
+}
+
+export const removeFromCartCtrl = async (req, res) => {
+    try {
+        const { userId } = req.user;
+
+        const { itemId } = req.body;
+
+        if (!isValidObjectId(userId) || !isValidObjectId(itemId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Id',
+                data: null,
+                error: 'BAD_REQUEST'
+            })
+        }
+
+        await removeFromCart(userId, itemId);
+
+        const cart = await getCart(userId)
+
+        return res.status(200).json({
+            success: true,
+            message: 'success',
+            data: { cart },
             error: null
         })
 
