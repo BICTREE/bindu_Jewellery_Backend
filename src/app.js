@@ -9,6 +9,7 @@ import { enquiryRouter } from "./routes/enquiry.route.js";
 import { productRouter } from "./routes/product.route.js";
 import { bannerRouter } from "./routes/banner.route.js";
 import { categoryRouter } from "./routes/category.route.js";
+import { reviewRouter } from "./routes/review.route.js";
 
 const app = express();
 
@@ -122,6 +123,7 @@ app.use("/api/users", userRouter);
 app.use("/api/enquiries", enquiryRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
+app.use("/api/reviews", reviewRouter);
 
 // 404 handler
 app.use((req, res) =>

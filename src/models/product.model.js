@@ -7,6 +7,11 @@ const ProductSchema = new Schema(
       required: true,
       trim: true,
     },
+    productID: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     description: {
       type: String,
     },
@@ -23,13 +28,31 @@ const ProductSchema = new Schema(
       type: Number,
       default: 0,
     },
+    metalType: {
+      type: String,
+    },
+    productDimensions: {
+      type: String,
+    },
     price: {
       type: Number,
       required: true,
       min: 0,
       default: 0,
     },
-    tax: {
+    makingCharges: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
+    stonePrice: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
+    gst: {
       type: Number,
       min: 0,
       default: 0,
