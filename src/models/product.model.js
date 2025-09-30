@@ -31,6 +31,9 @@ const ProductSchema = new Schema(
     metalType: {
       type: String,
     },
+    purity: {
+      type: String,
+    },
     productDimensions: {
       type: String,
     },
