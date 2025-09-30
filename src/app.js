@@ -74,6 +74,7 @@ const corsOptions = {
       admin_prod_url,
       // Fallback localhost URLs in case env vars aren't working
       "http://localhost:5173",
+      "http://localhost:3000",
       "http://localhost:5174",
       "https://bindu-jewellery-admin-side.vercel.app",
       "https://bindu-jewellery-frontend.vercel.app",
