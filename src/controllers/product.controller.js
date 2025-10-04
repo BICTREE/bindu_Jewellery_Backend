@@ -280,24 +280,34 @@ export const getManyProductsCtrl = async (req, res, next) => {
     }
 
     // ✅ Category filter (multiple values)
-    if (category?.trim()) {
-      const categoryIds = category.split(',').map(c => c.trim()).filter(isValidObjectId);
-      
-      if (categoryIds.length > 0) {
-        const catFilters = { 
-          $or: [
-            { parent: { $in: categoryIds } }, 
-            { _id: { $in: categoryIds } }
-          ] 
-        };
-        const cats = await getManyCategories(catFilters);
+ if (category?.trim()) {
+  const categoryIds = category
+    .split(',')
+    .map(c => c.trim())
+    .filter(isValidObjectId);
 
-        const productIds = cats?.flatMap((cat) => cat?.productIds) ?? [];
-        if (productIds.length > 0) {
-          filters._id = { $in: productIds };
-        }
-      }
+  if (categoryIds.length > 0) {
+    const catFilters = { 
+      $or: [
+        { parent: { $in: categoryIds } }, 
+        { _id: { $in: categoryIds } }
+      ] 
+    };
+    const cats = await getManyCategories(catFilters);
+
+    const productIds = cats?.flatMap((cat) => cat?.productIds) ?? [];
+
+    if (productIds.length > 0) {
+      filters._id = { $in: productIds };
+    } else {
+      // ✅ No products in this category → force empty result
+      filters._id = { $in: [] };
     }
+  } else {
+    // ✅ Invalid category IDs → also return empty
+    filters._id = { $in: [] };
+  }
+}
 
     // ✅ Query products
     let result = await getManyProducts(filters);
