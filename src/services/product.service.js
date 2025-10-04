@@ -256,26 +256,33 @@ export const checkIfVariantExists = async (productId, specs = []) => {
     const { variantItems = [] } = product;
 
     const normalizeSpecs = (specArr) =>
-        [...specArr].sort((a, b) => a.variationId.toString().localeCompare(b.variationId.toString()));
+        [...specArr].sort((a, b) =>
+            a.variationId.toString().localeCompare(b.variationId.toString())
+        );
 
-    const inputSpecs = normalizeSpecs(specs.map(spec => ({
-        variationId: spec.variationId.toString(),
-        optionId: spec.optionId.toString(),
-    })));
+    const inputSpecs = normalizeSpecs(
+        specs.map((spec) => ({
+            variationId: spec.variationId.toString(),
+            optionId: spec.optionId.toString(),
+        }))
+    );
 
-    const matchingVariant = variantItems.find(variant => {
+    // ✅ Allow "at least one spec" match
+    const matchingVariant = variantItems.find((variant) => {
         const variantSpecs = normalizeSpecs(
-            (variant.specs || []).map(spec => ({
+            (variant.specs || []).map((spec) => ({
                 variationId: spec.variationId.toString(),
                 optionId: spec.optionId.toString(),
             }))
         );
 
-        if (variantSpecs.length !== inputSpecs.length) return false;
-
-        return variantSpecs.every((vSpec, idx) =>
-            vSpec.variationId === inputSpecs[idx].variationId &&
-            vSpec.optionId === inputSpecs[idx].optionId
+        // instead of requiring full equality, check if ANY input spec matches
+        return inputSpecs.some((iSpec) =>
+            variantSpecs.some(
+                (vSpec) =>
+                    vSpec.variationId === iSpec.variationId &&
+                    vSpec.optionId === iSpec.optionId
+            )
         );
     });
 
