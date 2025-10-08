@@ -10,6 +10,7 @@ import { productRouter } from "./routes/product.route.js";
 import { bannerRouter } from "./routes/banner.route.js";
 import { categoryRouter } from "./routes/category.route.js";
 import { reviewRouter } from "./routes/review.route.js";
+import { uploadRouter } from "./routes/upload.route.js";
 
 const app = express();
 
@@ -125,6 +126,7 @@ app.use("/api/enquiries", enquiryRouter);
 app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
 app.use("/api/reviews", reviewRouter);
+app.use("/api/uploads", uploadRouter);
 
 // 404 handler
 app.use((req, res) =>
