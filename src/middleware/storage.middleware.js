@@ -2,11 +2,15 @@ import multer from 'multer';
 import multerS3 from 'multer-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 
-const accessKeyId = process.env.DO_SPACES_ACCESS_KEY_ID;
-const secretAccessKey = process.env.DO_SPACES_SECRET_ACCESS_KEY;
-const endpoint = process.env.DO_SPACES_ENDPOINT;
-const region = process.env.DO_SPACES_REGION;
-const Bucket = process.env.DO_SPACES_BUCKET;
+const accessKeyId = process.env.DO_SPACES_ACCESS_KEY_ID || "DO801KK3TRJBGUGYCTXG";
+const secretAccessKey = process.env.DO_SPACES_SECRET_ACCESS_KEY || "4Q/gqj7Vqv7kojJdIibokkhMaADR059LmK/kdsbVxUA";
+const endpoint = process.env.DO_SPACES_ENDPOINT || "https://sfo3.digitaloceanspaces.com";
+const region = process.env.DO_SPACES_REGION || "sfo3";
+const Bucket = process.env.DO_SPACES_BUCKET || "bindujewellery" ;
+
+console.log('Bucket:', Bucket);
+console.log('AccessKey:', accessKeyId);
+console.log('Endpoint:', endpoint);
 
 const s3Client = new S3Client({
     endpoint: endpoint,
