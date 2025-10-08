@@ -1,14 +1,14 @@
 import dotenv from 'dotenv';
+dotenv.config();
 import { connectDB } from './config/connectDB.js';
 import app from './app.js';
 import ServerlessHttp from 'serverless-http';
 
 
-dotenv.config();
 
 connectDB()
 
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 8081
 // ✅ instead export handler for Vercel
 // export const handler = ServerlessHttp(app);
 
