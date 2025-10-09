@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -11,6 +12,7 @@ import { bannerRouter } from "./routes/banner.route.js";
 import { categoryRouter } from "./routes/category.route.js";
 import { reviewRouter } from "./routes/review.route.js";
 import { uploadRouter } from "./routes/upload.route.js";
+import { mediaRouter } from "./routes/media.route.js";
 
 const app = express();
 
@@ -127,6 +129,7 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/uploads", uploadRouter);
+app.use("/api/media", mediaRouter);
 
 // 404 handler
 app.use((req, res) =>
