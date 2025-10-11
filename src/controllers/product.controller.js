@@ -24,6 +24,7 @@ import {
   deleteMultipleFilesFromDO,
 } from "../utils/storage.util.js";
 import { getManyCategories } from "../services/category.service.js";
+import { getGoldRateInInr, computeGoldPriceForProduct } from "../services/gold.service.js";
 
 export const createProductCtrl = async (req, res) => {
   try {
@@ -211,11 +212,14 @@ export const getProductByIdCtrl = async (req, res) => {
     }
 
     const productStock = await getProductStock(id);
+    const goldRate = await getGoldRateInInr().catch(() => null);
+    const totalGoldPrice = computeGoldPriceForProduct(product, goldRate);
+    console.log(totalGoldPrice,"rate")
 
     return res.status(200).json({
       success: true,
       message: "success",
-      data: { result: { ...product, stock: productStock } },
+      data: { result: { ...product, stock: productStock, totalGoldPrice }, goldRate },
       error: null,
     });
   } catch (error) {

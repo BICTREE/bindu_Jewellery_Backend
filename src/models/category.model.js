@@ -26,6 +26,14 @@ const CategorySchema = new Schema({
         }
     },
 
+    hoverImage: {
+        type: {
+            name: { type: String },
+            key: { type: String },
+            location: { type: String },
+        }
+    },
+
     productIds: [
         { type: Schema.Types.ObjectId, ref: 'Product' }
     ]
