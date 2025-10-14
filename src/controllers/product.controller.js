@@ -24,7 +24,10 @@ import {
   deleteMultipleFilesFromDO,
 } from "../utils/storage.util.js";
 import { getManyCategories } from "../services/category.service.js";
-import { getGoldRateInInr, computeGoldPriceForProduct } from "../services/gold.service.js";
+import {
+  getGoldRateInInr,
+  computeGoldPriceForProduct,
+} from "../services/gold.service.js";
 
 export const createProductCtrl = async (req, res) => {
   try {
@@ -214,12 +217,15 @@ export const getProductByIdCtrl = async (req, res) => {
     const productStock = await getProductStock(id);
     const goldRate = await getGoldRateInInr().catch(() => null);
     const totalGoldPrice = computeGoldPriceForProduct(product, goldRate);
-    console.log(totalGoldPrice,"rate")
+    console.log(totalGoldPrice, "rate");
 
     return res.status(200).json({
       success: true,
       message: "success",
-      data: { result: { ...product, stock: productStock, totalGoldPrice }, goldRate },
+      data: {
+        result: { ...product, stock: productStock, totalGoldPrice },
+        goldRate,
+      },
       error: null,
     });
   } catch (error) {
@@ -239,7 +245,8 @@ export const getManyProductsCtrl = async (req, res, next) => {
     page = parseInt(page);
     entries = parseInt(entries);
 
-    const { tag, search, category, minPrice, maxPrice, purity, weight } = req.query;
+    const { tag, search, category, minPrice, maxPrice, purity, weight } =
+      req.query;
 
     // Base filters
     const filters = { isArchived: false };
@@ -264,54 +271,209 @@ export const getManyProductsCtrl = async (req, res, next) => {
 
     // ✅ Tag filter (multiple values)
     if (tag?.trim()) {
-      const tags = tag.split(',').map(t => t.trim());
+      const tags = tag.split(",").map((t) => t.trim());
       filters.tags = { $in: tags };
     }
 
     // ✅ Purity filter (multiple values)
     if (purity?.trim()) {
-      const purities = purity.split(',').map(p => p.trim());
+      const purities = purity.split(",").map((p) => p.trim());
       filters.purity = { $in: purities };
     }
 
     // ✅ Weight filter (multiple values - check both grossWeight & netWeight)
     if (weight?.trim()) {
-      const weights = weight.split(',').map(w => w.trim());
-      filters.$or = weights.flatMap(w => [
-        { grossWeight: new RegExp(w, "i") },
-        { netWeight: new RegExp(w, "i") },
-      ]);
+      console.log(weight);
+      const weights = weight.split(",").map((w) => w.trim());
+      filters.$or = [];
+
+      for (const w of weights) {
+        if (w.includes("-")) {
+          // ✅ Case 1: Range like "5-10"
+          const [min, max] = w.split("-").map(Number);
+          if (!isNaN(min) && !isNaN(max)) {
+            filters.$or.push(
+              {
+                $expr: {
+                  $and: [
+                    {
+                      $gte: [
+                        {
+                          $toDouble: {
+                            $substr: [
+                              "$grossWeight",
+                              0,
+                              { $subtract: [{ $strLenCP: "$grossWeight" }, 1] },
+                            ],
+                          },
+                        },
+                        min,
+                      ],
+                    },
+                    {
+                      $lte: [
+                        {
+                          $toDouble: {
+                            $substr: [
+                              "$grossWeight",
+                              0,
+                              { $subtract: [{ $strLenCP: "$grossWeight" }, 1] },
+                            ],
+                          },
+                        },
+                        max,
+                      ],
+                    },
+                  ],
+                },
+              },
+              {
+                $expr: {
+                  $and: [
+                    {
+                      $gte: [
+                        {
+                          $toDouble: {
+                            $substr: [
+                              "$netWeight",
+                              0,
+                              { $subtract: [{ $strLenCP: "$netWeight" }, 1] },
+                            ],
+                          },
+                        },
+                        min,
+                      ],
+                    },
+                    {
+                      $lte: [
+                        {
+                          $toDouble: {
+                            $substr: [
+                              "$netWeight",
+                              0,
+                              { $subtract: [{ $strLenCP: "$netWeight" }, 1] },
+                            ],
+                          },
+                        },
+                        max,
+                      ],
+                    },
+                  ],
+                },
+              }
+            );
+          }
+        } else if (w.endsWith("+")) {
+          // ✅ Case 2: "20+" means greater than or equal to 20
+          const val = Number(w.replace("+", ""));
+          if (!isNaN(val)) {
+            filters.$or.push(
+              {
+                $expr: {
+                  $gte: [
+                    {
+                      $toDouble: {
+                        $substr: [
+                          "$grossWeight",
+                          0,
+                          { $subtract: [{ $strLenCP: "$grossWeight" }, 1] },
+                        ],
+                      },
+                    },
+                    val,
+                  ],
+                },
+              },
+              {
+                $expr: {
+                  $gte: [
+                    {
+                      $toDouble: {
+                        $substr: [
+                          "$netWeight",
+                          0,
+                          { $subtract: [{ $strLenCP: "$netWeight" }, 1] },
+                        ],
+                      },
+                    },
+                    val,
+                  ],
+                },
+              }
+            );
+          }
+        } else {
+          // ✅ Case 3: Single value like "5" -> less than or equal to 5
+          const val = Number(w);
+          if (!isNaN(val)) {
+            filters.$or.push(
+              {
+                $expr: {
+                  $lte: [
+                    {
+                      $toDouble: {
+                        $substr: [
+                          "$grossWeight",
+                          0,
+                          { $subtract: [{ $strLenCP: "$grossWeight" }, 1] },
+                        ],
+                      },
+                    },
+                    val,
+                  ],
+                },
+              },
+              {
+                $expr: {
+                  $lte: [
+                    {
+                      $toDouble: {
+                        $substr: [
+                          "$netWeight",
+                          0,
+                          { $subtract: [{ $strLenCP: "$netWeight" }, 1] },
+                        ],
+                      },
+                    },
+                    val,
+                  ],
+                },
+              }
+            );
+          }
+        }
+      }
     }
 
     // ✅ Category filter (multiple values)
- if (category?.trim()) {
-  const categoryIds = category
-    .split(',')
-    .map(c => c.trim())
-    .filter(isValidObjectId);
+    if (category?.trim()) {
+      const categoryIds = category
+        .split(",")
+        .map((c) => c.trim())
+        .filter(isValidObjectId);
 
-  if (categoryIds.length > 0) {
-    const catFilters = { 
-      $or: [
-        { parent: { $in: categoryIds } }, 
-        { _id: { $in: categoryIds } }
-      ] 
-    };
-    const cats = await getManyCategories(catFilters);
+      if (categoryIds.length > 0) {
+        const catFilters = {
+          $or: [
+            { parent: { $in: categoryIds } },
+            { _id: { $in: categoryIds } },
+          ],
+        };
+        const cats = await getManyCategories(catFilters);
 
-    const productIds = cats?.flatMap((cat) => cat?.productIds) ?? [];
+        const productIds = cats?.flatMap((cat) => cat?.productIds) ?? [];
 
-    if (productIds.length > 0) {
-      filters._id = { $in: productIds };
-    } else {
-      // ✅ No products in this category → force empty result
-      filters._id = { $in: [] };
+        if (productIds.length > 0) {
+          filters._id = { $in: productIds };
+        } else {
+          // ✅ No products in this category → force empty result
+          filters._id = { $in: [] };
+        }
+      } else {
+        // ✅ Invalid category IDs → also return empty
+        filters._id = { $in: [] };
+      }
     }
-  } else {
-    // ✅ Invalid category IDs → also return empty
-    filters._id = { $in: [] };
-  }
-}
 
     // ✅ Query products
     let result = await getManyProducts(filters);
@@ -328,7 +490,7 @@ export const getManyProductsCtrl = async (req, res, next) => {
       stock:
         product.variantItems?.reduce((sum, item) => sum + item.stock, 0) ?? 0,
     }));
-
+    // console.log(result);
     return res.status(200).json({
       success: true,
       message: "success",
