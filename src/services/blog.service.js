@@ -5,7 +5,7 @@ export const createBlog = async (obj) => {
 }
 
 export const getBlogById = async (id) => {
-    return await Blog.findOne({ _id: id, isArchived: false })
+    return await Blog.findOne({ _id: id})
 }
 
 export const getManyBlogs = async (filters = {}) => {
