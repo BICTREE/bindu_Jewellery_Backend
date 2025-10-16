@@ -19,7 +19,7 @@ export const getAllBlogs = async (filters = {}) => {
 
 export const updateBlog = async (id, obj = {}) => {
     return await Blog.findOneAndUpdate(
-        { _id: id, isArchived: false },
+        { _id: id },
         { $set: obj },
         { new: true }
     )

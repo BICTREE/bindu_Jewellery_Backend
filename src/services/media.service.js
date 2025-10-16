@@ -5,7 +5,7 @@ export const createMedia = async (obj) => {
 }
 
 export const getMediaById = async (id) => {
-    return await Media.findOne({ _id: id, isArchived: false })
+    return await Media.findOne({ _id: id })
 }
 
 export const getManyMedia = async (filters) => {
@@ -16,7 +16,7 @@ export const getManyMedia = async (filters) => {
 
 export const updateMedia = async (id, obj) => {
     return await Media.findOneAndUpdate(
-        { _id: id, isArchived: false }, 
+        { _id: id }, 
         { $set: obj }, 
         { new: true }
     )
