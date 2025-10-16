@@ -16,7 +16,7 @@ export const getManyMedia = async (filters) => {
 
 export const updateMedia = async (id, obj) => {
     return await Media.findOneAndUpdate(
-        { _id: id, isArchived: false }, 
+        { _id: id }, 
         { $set: obj }, 
         { new: true }
     )
