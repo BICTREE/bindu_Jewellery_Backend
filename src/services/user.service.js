@@ -326,7 +326,7 @@ export const getWishlist = async (userId) => {
     const user = await User.findById(userId)
         .populate({
             path: 'wishlist',
-            select: 'name price thumbnail tax variantItems',
+            select: 'name price thumbnail images tax variantItems',
             populate: [
                 {
                     path: 'variantItems.specs.variationId',
