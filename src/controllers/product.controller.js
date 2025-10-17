@@ -217,7 +217,7 @@ export const getProductByIdCtrl = async (req, res) => {
     const productStock = await getProductStock(id);
     const goldRate = await getGoldRateInInr().catch(() => null);
     const totalGoldPrice = computeGoldPriceForProduct(product, goldRate);
-    console.log(totalGoldPrice, "rate");
+    // console.log(totalGoldPrice, "rate");
 
     return res.status(200).json({
       success: true,
@@ -490,7 +490,6 @@ export const getManyProductsCtrl = async (req, res, next) => {
       stock:
         product.variantItems?.reduce((sum, item) => sum + item.stock, 0) ?? 0,
     }));
-    // console.log(result);
     return res.status(200).json({
       success: true,
       message: "success",

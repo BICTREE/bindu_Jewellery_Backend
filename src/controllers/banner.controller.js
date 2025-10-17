@@ -92,7 +92,7 @@ export const getManyBannersCtrl = async (req, res, next) => {
 
 
         let result = await getManyBanners(filters)
-        console.log({ result })
+        // console.log({ result })
 
         if (page && entries) {
             result = result.slice((page - 1) * entries, page * entries)

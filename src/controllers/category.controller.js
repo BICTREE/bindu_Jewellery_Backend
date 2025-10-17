@@ -205,7 +205,7 @@ export const getManyCategoriesCtrl = async (req, res, next) => {
         }
 
         let result = await getManyCategories(filters)
-        console.log({ result })
+        // console.log({ result })
 
         if (page && entries) {
             result = result.slice((page - 1) * entries, page * entries)
@@ -251,7 +251,7 @@ export const getAllCategoriesCtrl = async (req, res, next) => {
         }
 
         let result = await getManyCategories(filters)
-        console.log({ result })
+        // console.log({ result })
 
         if (page && entries) {
             result = result.slice((page - 1) * entries, page * entries)
