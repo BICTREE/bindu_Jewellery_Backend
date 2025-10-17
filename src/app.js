@@ -125,6 +125,13 @@ app.get("/", (req, res) => {
   `);
 });
 
+// Special debug for banners route
+app.use("/api/banners", (req, res, next) => {
+  console.log(`🎯 Banners API called from: ${req.headers.origin}`);
+  console.log(`🎯 Banners method: ${req.method}`);
+  next();
+});
+
 // API routes
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
