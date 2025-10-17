@@ -127,7 +127,6 @@ app.get("/", (req, res) => {
 
 // API routes
 app.use("/api/auth", authRouter);
-app.use("/api/banners", bannerRouter);
 app.use("/api/users", userRouter);
 app.use("/api/enquiries", enquiryRouter);
 app.use("/api/categories", categoryRouter);
@@ -136,6 +135,7 @@ app.use("/api/reviews", reviewRouter);
 app.use("/api/uploads", uploadRouter);
 app.use("/api/media", mediaRouter);
 app.use("/api/blogs", blogRouter);
+app.use("/api/banners", bannerRouter);
 
 // 404 handler
 app.use((req, res) =>
