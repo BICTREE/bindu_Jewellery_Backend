@@ -7,8 +7,9 @@ import { createBannerCtrl, deleteBannerCtrl, getBannerByIdCtrl, getManyBannersCt
 
 const bannerRouter = Router();
 
-bannerRouter.get('', getManyBannersCtrl);
-bannerRouter.get('/:id', getBannerByIdCtrl);
+bannerRouter.get("/", getManyBannersCtrl);
+bannerRouter.get("/:id", getBannerByIdCtrl);
+
 
 bannerRouter.use(authMiddleware)
 bannerRouter.use(roleChecker(['admin']))
