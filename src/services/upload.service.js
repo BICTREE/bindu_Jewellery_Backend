@@ -5,7 +5,8 @@ import path from 'path';
 
 const endpoint = process.env.DO_SPACES_ENDPOINT || "https://sfo3.digitaloceanspaces.com";
 
-const MAX_ALLOWED_SIZE = 20 * 1024 * 1024; // 20MB limit 
+const MAX_ALLOWED_SIZE = 50 * 1024 * 1024; // 50MB limit
+
 
 export const processAndUploadFile = async (file, index = 0, timestamp = Date.now()) => {
     if (file.size > MAX_ALLOWED_SIZE) {
