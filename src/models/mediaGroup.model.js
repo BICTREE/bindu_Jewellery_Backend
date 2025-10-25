@@ -1,11 +1,6 @@
 import { model, Schema } from "mongoose";
 
-const mediaSchema = new Schema({
-    group: {
-        type: Schema.Types.ObjectId,
-        ref: 'MediaGroup',
-        required: true
-    },
+const mediaItemSchema = new Schema({
     filetype: { 
         type: String,
         required: true,
@@ -34,6 +29,23 @@ const mediaSchema = new Schema({
     tags: [{
         type: String
     }],
+    order: {
+        type: Number,
+        default: 0
+    }
+}, { _id: true });
+
+const mediaGroupSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    description: {
+        type: String,
+        trim: true
+    },
+    media: [mediaItemSchema],
     isArchived: {
         type: Boolean,
         default: false
@@ -44,4 +56,4 @@ const mediaSchema = new Schema({
     }
 }, { timestamps: true });
 
-export const Media = model('Media', mediaSchema);
+export const MediaGroup = model('MediaGroup', mediaGroupSchema);
