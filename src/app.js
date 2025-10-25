@@ -14,6 +14,7 @@ import { reviewRouter } from "./routes/review.route.js";
 import { uploadRouter } from "./routes/upload.route.js";
 import { blogRouter } from "./routes/blog.route.js";
 import { mediaRouter } from "./routes/media.route.js";
+import { mediaGroupRouter } from "./routes/mediaGroup.route.js";
 
 const app = express();
 
@@ -135,6 +136,7 @@ app.use("/api/products", productRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/uploads", uploadRouter);
 app.use("/api/media", mediaRouter);
+app.use("/api/media-groups", mediaGroupRouter);
 app.use("/api/blogs", blogRouter);
 app.use("/api/banners", bannerRouter);
 
