@@ -1,6 +1,12 @@
 import { body } from "express-validator";
 
 const mediaCreateValidator = [
+    body("group")
+        .notEmpty()
+        .withMessage("Group is required")
+        .isMongoId()
+        .withMessage("Group must be a valid MongoDB ObjectId"),
+    
     body("filetype")
         .notEmpty()
         .withMessage("Filetype is required")
@@ -89,6 +95,11 @@ const mediaCreateValidator = [
 ];
 
 const mediaUpdateValidator = [
+    body("group")
+        .optional()
+        .isMongoId()
+        .withMessage("Group must be a valid MongoDB ObjectId"),
+    
     body("filetype")
         .optional()
         .isIn(["image", "video", "youtube"])
