@@ -21,7 +21,24 @@ export const createMediaGroupCtrl = async (req, res) => {
         return res.status(201).json({ success: true, message: 'Media group created successfully', data: { group }, error: null })
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success: false, message: 'Internal Server error', data: null, error: 'INTERNAL_SERVER_ERROR' })
+        
+        // Handle duplicate key error
+        if (error.code === 11000 || error.code === 11001) {
+            const field = Object.keys(error.keyPattern)[0];
+            return res.status(409).json({ 
+                success: false, 
+                message: `Media group with this ${field} already exists`, 
+                data: null, 
+                error: 'DUPLICATE_ENTRY' 
+            });
+        }
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal Server error', 
+            data: null, 
+            error: 'INTERNAL_SERVER_ERROR' 
+        });
     }
 }
 
@@ -109,13 +126,42 @@ export const getAllMediaGroupsCtrl = async (req, res) => {
 export const updateMediaGroupCtrl = async (req, res) => {
     try {
         const { id } = req.params;
-        if (!isValidObjectId(id)) return res.status(400).json({ success: false, message: 'Invalid Id', data: null, error: 'BAD_REQUEST' })
+        if (!isValidObjectId(id)) return res.status(400).json({ 
+            success: false, 
+            message: 'Invalid Id', 
+            data: null, 
+            error: 'BAD_REQUEST' 
+        });
+        
         const group = await updateMediaGroup(id, req.body);
-        if (!group) throw new Error('FAILED')
-        return res.status(200).json({ success: true, message: 'success', data: { group }, error: null })
+        if (!group) throw new Error('Media group not found');
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Media group updated successfully', 
+            data: { group }, 
+            error: null 
+        });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success: false, message: 'Internal Server error', data: null, error: 'INTERNAL_SERVER_ERROR' })
+        
+        // Handle duplicate key error
+        if (error.code === 11000 || error.code === 11001) {
+            const field = Object.keys(error.keyPattern)[0];
+            return res.status(409).json({ 
+                success: false, 
+                message: `Media group with this ${field} already exists`, 
+                data: null, 
+                error: 'DUPLICATE_ENTRY' 
+            });
+        }
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal Server error', 
+            data: null, 
+            error: 'INTERNAL_SERVER_ERROR' 
+        });
     }
 }
 
