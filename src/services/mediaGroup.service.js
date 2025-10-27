@@ -5,7 +5,7 @@ export const createMediaGroup = async (obj) => {
 }
 
 export const getMediaGroupById = async (id) => {
-    return await MediaGroup.findOne({ _id: id, isArchived: false })
+    return await MediaGroup.findOne({ _id: id})
 }
 
 export const getManyMediaGroups = async (filters = {}) => {
