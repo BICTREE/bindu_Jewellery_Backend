@@ -192,7 +192,7 @@ export const getCart = async (userId) => {
     const user = await User.findById(userId)
         .populate({
             path: 'cart.productId',
-            select: 'name price thumbnail tax variantItems'
+            select: 'name price thumbnail images tax variantItems'
         })
         .lean();
 
@@ -251,6 +251,7 @@ export const getCart = async (userId) => {
             extraPrice: varItem?.extraPrice || 0,
             tax: product.tax || 0,
             thumbnail: product.thumbnail || null,
+            image: product.images[0] || null,
             specs,
             stockStatus,
         };
